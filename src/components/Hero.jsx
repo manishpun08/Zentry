@@ -10,6 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(1);
   const [hasClicked, setHasClicked] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadedVideos, setLoadedVideos] = useState(0);
 
@@ -32,33 +33,39 @@ const Hero = () => {
 
   // for loader
   useEffect(() => {
-    if (loadedVideos === totalVideos - 1) {
-      setIsLoading(false);
+    if (loadedVideos === totalVideos) {
+      setIsLoading(false); // Hide loader only when all videos are loaded
     }
-  }, [loadedVideos]);
+  }, [loadedVideos, totalVideos]);
 
-  useGSAP(() => {
-    if (hasClicked) {
-      gsap.set("#next-video", { visibility: "visible" });
+  useGSAP(
+    () => {
+      if (hasClicked) {
+        gsap.set("#next-video", { visibility: "visible" });
 
-      gsap.to("#next-video", {
-        transformOrigin: "center center",
-        scale: 1,
-        width: "100%",
-        height: "100%",
-        duration: 1,
-        ease: "power1.inOut",
-        onStart: () => nextVideoRef.current.play(),
-      });
+        gsap.to("#next-video", {
+          transformOrigin: "center center",
+          scale: 1,
+          width: "100%",
+          height: "100%",
+          duration: 1,
+          ease: "power1.inOut",
+          onStart: () => nextVideoRef.current.play(),
+        });
 
-      gsap.from("#current-video", {
-        transformOrigin: "center center",
-        duration: 1.5,
-        scale: 0,
-        ease: "power1.inOut",
-      });
+        gsap.from("#current-video", {
+          transformOrigin: "center center",
+          duration: 1.5,
+          scale: 0,
+          ease: "power1.inOut",
+        });
+      }
+    },
+    {
+      dependencies: [currentIndex],
+      revertOnUpdate: true,
     }
-  }, [hasClicked, currentIndex]);
+  );
 
   useGSAP(() => {
     gsap.set("#video-frame", {
@@ -92,6 +99,7 @@ const Hero = () => {
           </div>
         </div>
       )} */}
+
       <div
         id="video-frame"
         className="relative z-10 h-dvh w-screen rounded-lg overflow-hidden bg-blue-75"
